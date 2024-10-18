@@ -12,11 +12,11 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { id: 1, text: 'Home-Duka', path: '/' },
+    { id: 1, text: 'Home', path: '/' },
     { id: 2, text: 'Products', path: '/products' },
     { id: 3, text: 'Cart', path: '/cart' },
     { id: 4, text: 'Contact', path: '/contact' },
-    { id: 5, text: user ? `${user.name}` : 'User' }, // Display logged-in user's name
+    { id: 5, text: user ? `${user.name}` : 'User' } // Display logged-in user's name
   ];
 
   return (
