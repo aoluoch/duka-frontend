@@ -1,69 +1,74 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { toast } from 'react-toastify'; // Import toast for notifications
 
 const AuthForm = () => {
     const { register, login } = useContext(AuthContext);
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [isLogin, setIsLogin] = useState(true);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    const handleSubmit = async (e) => {
+    const toggleForm = () => {
+        setIsLogin(!isLogin);
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if (isRegistering) {
-            await register(formData.name, formData.email, formData.password);
-            setIsRegistering(false); // Set back to login mode after registration
-            toast.info('Please log in to continue.'); // Notify the user to log in
+        if (isLogin) {
+            login(email, password);
         } else {
-            await login(formData.email, formData.password);
+            register(name, email, password);
         }
-        navigate('/'); // Redirect to home page after successful login or registration
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <form onSubmit={handleSubmit} className="w-1/2 p-8 bg-white rounded-lg shadow-lg space-y-6">
-                {isRegistering && (
-                    <div>
-                        <label className="block text-gray-700 font-bold mb-2">Name</label>
+        <div className="flex justify-center items-center h-screen">
+            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-96">
+                <h2 className="text-2xl font-bold mb-4">{isLogin ? 'Login' : 'Register'}</h2>
+                {!isLogin && (
+                    <div className="mb-4">
+                        <label className="block mb-2 text-sm font-bold text-gray-700">Name</label>
                         <input
                             type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full p-2 border rounded-lg"
                             required
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 )}
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Email</label>
+                <div className="mb-4">
+                    <label className="block mb-2 text-sm font-bold text-gray-700">Email</label>
                     <input
                         type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-2 border rounded-lg"
                         required
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Password</label>
+                <div className="mb-4">
+                    <label className="block mb-2 text-sm font-bold text-gray-700">Password</label>
                     <input
                         type="password"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-2 border rounded-lg"
                         required
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <div className="flex items-center justify-between">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        {isRegistering ? 'Register' : 'Login'}
+                <button
+                    type="submit"
+                    className="bg-green-500 text-white py-2 px-4 rounded-lg w-full"
+                >
+                    {isLogin ? 'Login' : 'Register'}
+                </button>
+                <p className="mt-4 text-sm text-center">
+                    {isLogin ? 'Need an account?' : 'Already have an account?'}{' '}
+                    <button type="button" onClick={toggleForm} className="text-blue-500 underline">
+                        {isLogin ? 'Register' : 'Login'}
                     </button>
-                    <button type="button" onClick={() => setIsRegistering(!isRegistering)} className="text-blue-500 hover:text-blue-700 font-bold">
-                        {isRegistering ? 'Login' : 'Register'}
-                    </button>
-                </div>
+                </p>
             </form>
         </div>
     );
