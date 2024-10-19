@@ -11,7 +11,7 @@ const Products = () => {
 
   // Fetch products from the API
   useEffect(() => {
-    fetch('https://dukaapp-2.onrender.com/products')
+    fetch('https://dukaapp-3.onrender.com/products')
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error fetching products:', error));

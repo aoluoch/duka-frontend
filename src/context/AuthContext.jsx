@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     // Register user
     const register = async (name, email, password) => {
         try {
-            const response = await axios.post('https://dukaapp-2.onrender.com/register', { name, email, password });
+            const response = await axios.post('https://dukaapp-3.onrender.com/register', { name, email, password });
             if (response.status === 201) {
                 toast.success('Registration successful');
                 login(email, password); // Auto-login after successful registration
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     // Login user
     const login = async (email, password) => {
         try {
-            const response = await axios.post('https://dukaapp-2.onrender.com/login', { email, password });
+            const response = await axios.post('https://dukaapp-3.onrender.com/login', { email, password });
             setUser(response.data);
             toast.success('Login successful');
         } catch (error) {
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     // Logout user
     const logout = async () => {
         try {
-            await axios.post('https://dukaapp-2.onrender.com/logout');
+            await axios.post('https://dukaapp-3.onrender.com/logout');
             setUser(null);
             toast.success('Logout successful');
         } catch (error) {
