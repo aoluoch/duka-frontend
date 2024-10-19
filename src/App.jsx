@@ -18,10 +18,10 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/auth" element={<AuthForm />} />
-        <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-        <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
-        <Route path="/cart" element={<PrivateRoute><Cartpage /></PrivateRoute>} />
-        <Route path="/contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/cart" element={<Cartpage />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </AuthProvider>
   );

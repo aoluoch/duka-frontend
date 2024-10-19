@@ -7,30 +7,15 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
-    // Check for user session on page load
-    const checkSession = async () => {
-        try {
-            const response = await axios.get('https://dukaapp-1.onrender.com/check_session');
-            if (response.data) {
-                setUser(response.data); // Assuming response has user data
-            }
-        } catch (error) {
-            setUser(null);
-        }
-    };
-
+    // Check session and load user from localStorage on mount
     useEffect(() => {
-        checkSession();
-    }, []);
-
-    // Persist user state on refresh
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = JSON.parse(localStorage.getItem('user'));
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            setUser(storedUser);
         }
     }, []);
 
+    // Update localStorage whenever user changes
     useEffect(() => {
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
@@ -39,43 +24,34 @@ export const AuthProvider = ({ children }) => {
         }
     }, [user]);
 
-    // Register
+    // Register user
     const register = async (name, email, password) => {
         try {
-            const response = await axios.post('https://dukaapp-1.onrender.com/register', { name, email, password });
+            const response = await axios.post('https://dukaapp-2.onrender.com/register', { name, email, password });
             if (response.status === 201) {
                 toast.success('Registration successful');
-                // Optionally login the user automatically
-                login(email, password);
-            } else {
-                throw new Error('Failed to register');
+                login(email, password); // Auto-login after successful registration
             }
         } catch (error) {
-            const message = error.response?.data?.message || 'Error during registration';
-            toast.error(message);
+            toast.error('Error during registration');
         }
     };
 
-    // Login
+    // Login user
     const login = async (email, password) => {
         try {
-            const response = await axios.post('https://dukaapp-1.onrender.com/login', { email, password });
-            if (response.status === 200) {
-                setUser(response.data);
-                toast.success('Login successful');
-            } else {
-                throw new Error('Invalid credentials');
-            }
+            const response = await axios.post('https://dukaapp-2.onrender.com/login', { email, password });
+            setUser(response.data);
+            toast.success('Login successful');
         } catch (error) {
-            const message = error.response?.data?.message || 'Wrong email or password';
-            toast.error(message);
+            toast.error('Wrong email or password');
         }
     };
 
-    // Logout
+    // Logout user
     const logout = async () => {
         try {
-            await axios.delete('https://dukaapp-1.onrender.com/logout');
+            await axios.post('https://dukaapp-2.onrender.com/logout');
             setUser(null);
             toast.success('Logout successful');
         } catch (error) {

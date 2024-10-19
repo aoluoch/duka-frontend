@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import Footer from './Footer';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // Fetch products from the API
   useEffect(() => {
-    fetch('https://dukaapp-1.onrender.com/products')
+    fetch('https://dukaapp-2.onrender.com/products')
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error fetching products:', error));
@@ -16,33 +19,29 @@ const Products = () => {
 
   // Add to Cart Handler
   const handleAddToCart = (product) => {
+    if (!user) {
+      navigate('/auth'); // Redirect to login if not authenticated
+      toast.info('Please log in to add products to the cart');
+      return;
+    }
+
     const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    // Check if the product is already in the cart
     const productExists = existingCart.find(item => item.id === product.id);
-    
+
     if (productExists) {
       productExists.quantity += 1;
     } else {
       product.quantity = 1;
       existingCart.push(product);
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(existingCart));
 
-    // Show toast notification
-    toast.success(`${product.name} has been added to your cart!`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    toast.success(`${product.name} added to your cart!`);
   };
 
   return (
+    <>
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Products</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -61,12 +60,9 @@ const Products = () => {
           </div>
         ))}
       </div>
-      
-      {/* Toast Notification Container */}
-      <ToastContainer />
-
-      <Footer />
     </div>
+    <Footer/>
+    </>
   );
 };
 
