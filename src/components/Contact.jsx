@@ -1,89 +1,103 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Footer from './Footer';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Contact = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-    });
+function Contact() {
+  const formRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    formData.append("access_key", "bdef880e-2da8-4e53-bf48-c7b8987045ba");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Here you can handle form submission logic, e.g., sending data to an API
-        console.log('Form submitted:', formData);
-        // Reset the form after submission
-        setFormData({ name: '', email: '', subject: '', message: '' });
-    };
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
 
-    return (
-      <>
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <form onSubmit={handleSubmit} className="w-1/2 p-8 bg-white rounded-lg shadow-lg space-y-6">
-                <h2 className="text-2xl font-bold text-center">Contact Us</h2>
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Subject</label>
-                    <input
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700 font-bold mb-2">Message</label>
-                    <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        rows="4"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    ></textarea>
-                </div>
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded focus:outline-none focus:shadow-outline"
-                >
-                    Send Message
-                </button>
-            </form>
+    setIsSubmitting(true);
 
-            
-        </div>
-        <Footer/>
-      </>
-    );
-};
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: json,
+    }).then((res) => res.json());
+
+    setIsSubmitting(false);
+
+    if (res.success) {
+      toast.success("Message sent successfully!");
+      formRef.current.reset();
+    } else {
+      toast.error("Failed to send message. Please try again.");
+    }
+  };
+
+  return (
+    <>
+      <section className="bg-gray-100 p-8">
+        <form
+          ref={formRef}
+          onSubmit={onSubmit}
+          className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md space-y-6"
+        >
+          <h2 className="text-2xl font-semibold text-gray-800">Contact Form</h2>
+          <div className="space-y-2">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your full name"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+              Your Message
+            </label>
+            <textarea
+              name="message"
+              rows="4"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your message"
+              required
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </section>
+
+      <Footer />
+    </>
+  );
+}
 
 export default Contact;

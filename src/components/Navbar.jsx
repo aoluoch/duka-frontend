@@ -24,12 +24,15 @@ const Navbar = () => {
         <li className='p-4 hover:bg-[#00df9a] rounded-xl m-2 cursor-pointer'>
           <Link to="/cart">Cart</Link>
         </li>
+        <li className='p-4 hover:bg-[#00df9a] rounded-xl m-2 cursor-pointer'>
+          <Link to="/contact">Contact</Link>
+        </li>
         {user ? (
           <>
             <li className='p-4 text-white'>
               Hello, {user.name}
             </li>
-            <button onClick={logout} className="p-4 hover:bg-[#fff] rounded-xl m-2 cursor-pointer">
+            <button onClick={logout} className="p-4 hover:bg-[#00df9a] rounded-xl m-2 cursor-pointer">
               Logout
             </button>
           </>
