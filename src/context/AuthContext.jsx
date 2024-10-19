@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     // Logout user
     const logout = async () => {
         try {
-            await axios.post('https://dukaapp-3.onrender.com/logout');
+            await axios.delete('https://dukaapp-3.onrender.com/logout');
             setUser(null);
             toast.success('Logout successful');
         } catch (error) {

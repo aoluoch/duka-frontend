@@ -7,7 +7,6 @@ import Cartpage from './components/Cartpage';
 import Contact from './components/Contact';
 import AuthForm from './components/AuthForm';
 import { AuthProvider } from './context/AuthContext';
-import PrivateRoute from './components/PrivateRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
