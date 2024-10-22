@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Footer from './Footer';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Cartpage = () => {
   const [cart, setCart] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef(null);
 
   // Load cart from local storage on mount
   useEffect(() => {
@@ -33,6 +38,49 @@ const Cartpage = () => {
   // Calculate total price
   const calculateTotalPrice = () => {
     return cart.reduce((total, product) => total + (product.price * product.quantity), 0);
+  };
+
+  // Handle checkout button click
+  const handleCheckout = () => {
+    setShowForm(true);
+  };
+
+  // Submit form to Web3forms
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    formData.append("access_key", "bdef880e-2da8-4e53-bf48-c7b8987045ba");
+
+    cart.forEach((product, index) => {
+      formData.append(`Product ${index + 1}`, `${product.name} (Quantity: ${product.quantity}) - $${(product.price * product.quantity).toFixed(2)}`);
+    });
+
+    formData.append("Total Price", `$${calculateTotalPrice().toFixed(2)}`);
+
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    setIsSubmitting(true);
+
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: json,
+    }).then((res) => res.json());
+
+    setIsSubmitting(false);
+
+    if (res.success) {
+      toast.success("Order submitted successfully!");
+      formRef.current.reset();
+      setShowForm(false); // hide form after successful submission
+    } else {
+      toast.error("Failed to submit the order. Please try again.");
+    }
   };
 
   return (
@@ -86,12 +134,41 @@ const Cartpage = () => {
         <div className="mt-6 border-t pt-4">
           <h2 className="text-2xl font-bold text-right">Total: ${calculateTotalPrice().toFixed(2)}</h2>
           <div className="flex justify-end mt-4">
-            <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+            <button 
+              className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+              onClick={handleCheckout}
+            >
               Checkout
             </button>
           </div>
         </div>
       )}
+
+      {/* Show form after checkout button is clicked */}
+      {showForm && (
+        <form
+          ref={formRef}
+          onSubmit={onSubmit}
+          className="mt-6 max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md space-y-6"
+        >
+          <h2 className="text-2xl font-semibold text-gray-800">Order Summary</h2>
+          {cart.map((product, index) => (
+            <div key={product.id}>
+              <p>Product {index + 1}: {product.name} (Quantity: {product.quantity}) - ${product.price.toFixed(2)}</p>
+            </div>
+          ))}
+          <p className="text-right font-bold">Total: ${calculateTotalPrice().toFixed(2)}</p>
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Sending..." : "Submit Order"}
+          </button>
+        </form>
+      )}
+
       <Footer />
     </div>
   );
