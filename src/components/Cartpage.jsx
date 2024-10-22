@@ -57,6 +57,7 @@ const Cartpage = () => {
     });
 
     formData.append("Total Price", `$${calculateTotalPrice().toFixed(2)}`);
+    formData.append("Phone Number", formRef.current.phone.value); // append phone number to form data
 
     const object = Object.fromEntries(formData);
     const json = JSON.stringify(object);
@@ -78,6 +79,8 @@ const Cartpage = () => {
       toast.success("Order submitted successfully!");
       formRef.current.reset();
       setShowForm(false); // hide form after successful submission
+      updateCart([]); // clear the cart
+      localStorage.removeItem('cart'); // clear the cart from local storage
     } else {
       toast.error("Failed to submit the order. Please try again.");
     }
@@ -158,6 +161,19 @@ const Cartpage = () => {
             </div>
           ))}
           <p className="text-right font-bold">Total: ${calculateTotalPrice().toFixed(2)}</p>
+
+          {/* Phone number field */}
+          <div>
+            <label htmlFor="phone" className="block text-gray-700 font-medium">Phone Number</label>
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              required
+              placeholder="Enter your phone number"
+              className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
 
           <button
             type="submit"
